@@ -1,0 +1,20 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<form method="get">
+    <input type="text" name="city" value="@Model.City" />
+    <button type="submit">Search</button>
+</form>
+
+@if (!string.IsNullOrWhiteSpace(ViewData["CityName"]?.ToString()))
+{
+    <h1>Weather For @ViewData["CityName"], @ViewData["Country"]</h1>
+
+    <p>Temperature: @ViewData["Temperature"]°C</p>
+    <p>Humidity: @ViewData["Humidity"]%</p>
+    <p>Wind Speed: @ViewData["WindSpeed"] m/s</p>
+    <p>Last Updated: @((DateTime)ViewData["LastUpdated"]!)</p>
+}
