@@ -17,15 +17,17 @@ builder.Services.AddScoped<IWeatherDataRepository, WeatherDataRepository>();
 // Register the task scheduler
 builder.Services.AddSingleton<IHostedService, WeatherDataRefreshService>();
 
-#pragma warning disable ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-var dbContext = builder.Services?.BuildServiceProvider().GetService<WeatherDbContext>();
-#pragma warning restore ASP0000 // Do not call 'IServiceCollection.BuildServiceProvider' in 'ConfigureServices'
-if (dbContext is not null)
-{
-    dbContext.Database.Migrate();
-}
-
 var app = builder.Build();
+
+// Migrate latest database changes during startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider
+        .GetRequiredService<WeatherDbContext>();
+
+    dbContext?.Database.EnsureCreated();
+    dbContext?.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
